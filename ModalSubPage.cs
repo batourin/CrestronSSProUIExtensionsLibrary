@@ -11,8 +11,15 @@ namespace Daniels.UI
     public class ModalSubPage: SubPage
     {
         private ShowModalCallback _callBack;
-        public ModalSubPage(uint visibilityJoin, uint transitionJoin, List<uint> closeJoins, uint booleanOffset, uint analogOffset, uint serialOffset)
-            : base(visibilityJoin, transitionJoin, closeJoins, booleanOffset, analogOffset, serialOffset)
+
+        public ModalSubPage(SubPageParameters subPageParameters)
+            : base(subPageParameters)
+        {
+
+        }
+
+        public ModalSubPage(string name, uint visibilityJoin, uint transitionJoin, List<uint> closeJoins, uint booleanOffset, uint analogOffset, uint serialOffset)
+            : base(name, visibilityJoin, transitionJoin, closeJoins, booleanOffset, analogOffset, serialOffset)
         {
 
         }
@@ -27,11 +34,11 @@ namespace Daniels.UI
         protected override void panel_SigChange(BasicTriList currentDevice, SigEventArgs args)
         {
             base.panel_SigChange(currentDevice, args);
-            if (args.Sig.Type == eSigType.Bool && _closeJoins.Contains(args.Sig.Number - _analogOffset))
+            if (args.Sig.Type == eSigType.Bool && _closeJoins.Contains(AnalogRelativeJoin(args.Sig.Number)))
             {
                 if (_callBack != null)
                 {
-                    _callBack.Invoke(this, new SubPageClosedEventArgs(args.Sig.Number - _analogOffset));
+                    _callBack.Invoke(this, new SubPageClosedEventArgs(AnalogRelativeJoin(args.Sig.Number)));
                     _callBack = null;
                 }
             }

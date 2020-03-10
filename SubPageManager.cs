@@ -11,16 +11,15 @@ namespace Daniels.UI
 {
     public class SubPageManager: IEnumerable<SubPage>
     {
-        internal BasicTriList _panel;
         List<SubPage> _subPages = new List<SubPage>();
 
         #region Constructors
 
         public SubPageManager(BasicTriList panel)
         {
-            _panel = panel;
+            Panel = panel;
 
-            _panel.SigChange += new SigEventHandler(_panel_SigChange);
+            Panel.SigChange += new SigEventHandler(_panel_SigChange);
         }
 
         public SubPageManager(BasicTriList panel, SubPage subPage)
@@ -35,26 +34,46 @@ namespace Daniels.UI
             _subPages = subPages;
             foreach (var subPage in _subPages)
             {
-                subPage.Manager = this;
+                subPage.Panel = Panel;
+                subPage.VisibilityChange = new Func<SubPage, bool>(subPage_VisibilityChange);
             }
+        }
+
+        public override string ToString()
+        {
+            StringBuilder sb = new StringBuilder(this.GetType().Name + "\r\n");
+            sb.AppendLine("\tPanel: " + Panel.Description);
+            foreach (var subPage in _subPages)
+            {
+                sb.AppendFormat("\t\t{0}: {1}\t {2}\r\n", subPage.Id, subPage.Name, subPage.Visible);
+            }
+
+            return sb.ToString();
+        }
+
+        public BasicTriList Panel
+        {
+            get;
+            protected set;
         }
 
         public void Add(SubPage subPage)
         {
-            subPage.Manager = this;
+            subPage.Panel = Panel;
             _subPages.Add(subPage);
         }
 
-        internal void MakeVisible(SubPage subPage)
+        /*
+        internal void MakeVisible1(SubPage subPage)
         {
-            _panel.BooleanInput[subPage.VisibilityJoin].BoolValue = true;
+            Panel.BooleanInput[subPage.VisibilityJoin].BoolValue = true;
         }
 
-        internal void Hide(SubPage subPage)
+        internal void Hide1(SubPage subPage)
         {
-            _panel.BooleanInput[subPage.VisibilityJoin].BoolValue = false;
+            Panel.BooleanInput[subPage.VisibilityJoin].BoolValue = false;
         }
-
+        */
         #endregion Constructors
 
         #region Event Handlers
@@ -64,8 +83,16 @@ namespace Daniels.UI
 
         }
 
-        #endregion Event Handlers
+        /// <summary>
+        /// subPage_VisibilityChange: Event Handler that permit to allow or block Visibility change 
+        /// </summary>
+        /// <param name="args">SubPage that is asking permission to change visibility</param>
+        protected virtual bool subPage_VisibilityChange(SubPage arg)
+        {
+            return true;
+        }
 
+        #endregion Event Handlers
 
         #region Indexes
 

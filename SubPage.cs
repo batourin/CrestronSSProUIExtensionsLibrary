@@ -9,36 +9,47 @@ using Daniels.Common;
 
 namespace Daniels.UI
 {
-    public class SubPage
+    public class SubPageParameters: BasicTriListParameters
     {
-        protected SubPageManager _manager;
+        public uint VisibilityJoin;
+        public uint TransitionJoin;
+        public List<uint> CloseJoins;
+    }
+
+    public class SubPage: TriListBase
+    {
         internal readonly uint VisibilityJoin;
         internal readonly uint TransitionJoin;
         protected List<uint> _closeJoins = new List<uint>();
-        protected readonly uint _booleanOffset;
-        protected readonly uint _analogOffset;
-        protected readonly uint _serialOffset;
-
         //internal bool 
 
-        public SubPage(uint visibilityJoin, uint transitionJoin, List<uint> closeJoins, uint booleanOffset, uint analogOffset, uint serialOffset)
+        public SubPage(string name, uint visibilityJoin, uint transitionJoin, List<uint> closeJoins, uint booleanOffset, uint analogOffset, uint serialOffset)
+            : base(visibilityJoin, name, booleanOffset, analogOffset, serialOffset)
         {
             VisibilityJoin = visibilityJoin;
             TransitionJoin = transitionJoin;
             _closeJoins = closeJoins;
-            _booleanOffset = booleanOffset;
-            _analogOffset = analogOffset;
-            _serialOffset = serialOffset;
         }
 
-        internal SubPageManager Manager
+        public SubPage(SubPageParameters subPageParameters)
+            : this(subPageParameters.Name, subPageParameters.VisibilityJoin, subPageParameters.TransitionJoin, subPageParameters.CloseJoins, subPageParameters.BooleanOffset, subPageParameters.AnalogOffset, subPageParameters.SerialOffset) 
         {
-            set
-            {
-                _manager = value;
-                _manager._panel.SigChange += new SigEventHandler(panel_SigChange);
-            }
         }
+
+        public override string ToString()
+        {
+            StringBuilder sb = new StringBuilder(base.ToString());
+            sb.AppendLine("\tVisibilityJoin: " + VisibilityJoin);
+            sb.AppendLine("\tTransitionJoin: " + TransitionJoin);
+            sb.AppendLine("\tVisible: " + Visible);
+            if (_closeJoins.Count > 0)
+                sb.AppendLine("\tCloseJoins: " + String.Join(",", _closeJoins.Select(n => n.ToString()).ToArray()));
+            else
+                sb.AppendLine("\tCloseJoins: NONE");
+            return sb.ToString();
+        }
+
+        internal Func<SubPage, bool> VisibilityChange;
 
         public virtual event EventHandler<ReadOnlyEventArgs<bool>> VisibilityChanged;
         protected virtual void OnVisibilityChanged(ReadOnlyEventArgs<bool> e)
@@ -49,45 +60,18 @@ namespace Daniels.UI
                 handler(this, e);
             }
         }
-        private bool visible = false;
         public bool Visible
         {
-            get { return visible; }
+            get { return Panel.BooleanInput[VisibilityJoin].BoolValue; }
             set
             {
-                visible = value;
-                if(value)
-                    _manager.MakeVisible(this);
-                else
-                    _manager.Hide(this);
-                OnVisibilityChanged(new ReadOnlyEventArgs<bool>(visible)); 
+                Func<SubPage, bool> visibilityChange = VisibilityChange;
+                if (visibilityChange == null || (visibilityChange != null && visibilityChange(this)))
+                {
+                    Panel.BooleanInput[VisibilityJoin].BoolValue = value;
+                    OnVisibilityChanged(new ReadOnlyEventArgs<bool>(value));
+                }
             }
-        }
-
-        /*
-        public uint BooleanJoin1(uint join)
-        {
-            return _booleanOffset + join;
-        }
-        public uint AnalogJoin1(uint join)
-        {
-            return _analogOffset + join;
-        }
-         */ 
-        
-        /*public uint SerialJoinGet(uint join)
-        {
-            return _serialOffset + join;
-        }*/
-
-        public string SerialJoinGet(uint join)
-        {
-            return _manager._panel.StringOutput[_serialOffset + join].StringValue;
-        }
-
-        public void SerialJoinSet(uint join, string value)
-        {
-            _manager._panel.StringInput[_serialOffset + join].StringValue = value;
         }
 
         public class SubPageClosedEventArgs : EventArgs
@@ -113,12 +97,13 @@ namespace Daniels.UI
             }
         }
 
-        protected virtual void panel_SigChange(BasicTriList currentDevice, SigEventArgs args)
+        protected override void panel_SigChange(BasicTriList currentDevice, SigEventArgs args)
         {
-            if (args.Sig.Type == eSigType.Bool && _closeJoins.Contains(args.Sig.Number - _analogOffset))
+            //CrestronConsole.PrintLine("panel-SigChange: args.Sig.Ty[e");
+            if (args.Sig.Type == eSigType.Bool && args.Sig.BoolValue && _closeJoins.Contains(AnalogRelativeJoin(args.Sig.Number)))
             {
                 Visible = false;
-                OnSubPageClosed(new SubPageClosedEventArgs(args.Sig.Number - _analogOffset));
+                OnSubPageClosed(new SubPageClosedEventArgs(AnalogRelativeJoin(args.Sig.Number)));
             }
         }
 

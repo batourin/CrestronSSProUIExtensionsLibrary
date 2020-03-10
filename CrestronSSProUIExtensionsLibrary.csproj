@@ -67,12 +67,23 @@
     <Reference Include="System.Data" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ActionEventHandler.cs" />
+    <Compile Include="AuthenticatedSubPageManager.cs" />
     <Compile Include="CrestronUIExtensions.cs" />
     <Compile Include="ModalSubPage.cs" />
+    <Compile Include="PinLockSubPage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SmartObjectReferenceListHelper.cs" />
+    <Compile Include="SmartObjectDynamicButtonIconListItem.cs" />
+    <Compile Include="SmartObjectDynamicButtonIconListHelper.cs" />
+    <Compile Include="SmartObjectDynamicListHelper.cs" />
+    <Compile Include="SmartObjectDynamicListItem.cs" />
+    <Compile Include="SmartObjectHelper.cs" />
+    <Compile Include="SmartObjectReferenceListItem.cs" />
     <Compile Include="SubPage.cs" />
     <Compile Include="SubPageManager.cs" />
     <Compile Include="TextEntrySubPage.cs" />
+    <Compile Include="TriListBase.cs" />
     <None Include="Properties\ControlSystem.cfg" />
   </ItemGroup>
   <ItemGroup>
