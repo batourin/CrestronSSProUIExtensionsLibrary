@@ -73,6 +73,7 @@
     <Compile Include="ModalSubPage.cs" />
     <Compile Include="PinLockSubPage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SigActionExtensions.cs" />
     <Compile Include="SmartObjectReferenceListHelper.cs" />
     <Compile Include="SmartObjectDynamicButtonIconListItem.cs" />
     <Compile Include="SmartObjectDynamicButtonIconListHelper.cs" />

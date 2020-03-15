@@ -4,6 +4,7 @@ using Crestron.SimplSharpPro;                       				// For Basic SIMPL#Pro c
 
 namespace Daniels.UI
 {
+    /*
     public static class UISLRJoins
     {
         public const string SetNumberOfItems = "Set Number of Items";
@@ -69,6 +70,6 @@ namespace Daniels.UI
             return stringOutput + ((index - 1) * _serialIncrement + join).ToString();
         }
 
-    }
+    }*/
 }
 

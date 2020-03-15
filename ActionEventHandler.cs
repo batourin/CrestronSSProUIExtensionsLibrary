@@ -10,11 +10,12 @@ namespace Daniels.UI
     public static class EventHandlers
     {
         /// <summary>
-        /// AuthenticatedSubPageManager constructor 
+        /// SigUserObjectActionEventHandler: universal EventHandler for actions assigned in signals UserObject property
+        /// Code copied from CrestronLabs
         /// </summary>
         /// <param name="currentDevice">Device originating the event</param>
         /// <param name="args">Event arguments</param>
-        public static void ActionEventHandler(GenericBase currentDevice, SigEventArgs args)
+        public static void SigUserObjectActionEventHandler(GenericBase currentDevice, SigEventArgs args)
         {
             var sig = args.Sig;
             var uo = sig.UserObject;

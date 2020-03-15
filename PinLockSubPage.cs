@@ -67,7 +67,7 @@ namespace Daniels.UI
                         }
                     }
                 });
-                panel.SmartObjects[_params.KeyPadSmartObjectId].SigChange += new SmartObjectSigChangeEventHandler(EventHandlers.ActionEventHandler);
+                panel.SmartObjects[_params.KeyPadSmartObjectId].SigChange += new SmartObjectSigChangeEventHandler(EventHandlers.SigUserObjectActionEventHandler);
             }
         }
 
