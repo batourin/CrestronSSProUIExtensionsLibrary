@@ -10,10 +10,15 @@ namespace Daniels.UI
 {
     public class SmartObjectDynamicButtonIconListHelper : SmartObjectDynamicListHelper
     {
+        private Dictionary<uint, SmartObjectDynamicButtonIconListItem> _items;
+
         public SmartObjectDynamicButtonIconListHelper(SmartObject smartObject, SmartObjectDynamicListHelperParameters helperParams)
             : base(smartObject, helperParams)
         {
-
+            _items = new Dictionary<uint, SmartObjectDynamicButtonIconListItem>(MaxNumberOfItems);
+            for (uint i = 1; i <= MaxNumberOfItems; i++)
+                _items.Add(i, new SmartObjectDynamicButtonIconListItem(this, i));
+            Items = new ReadOnlyDictionary<uint, SmartObjectDynamicButtonIconListItem>(_items);
         }
 
         #region Properties
@@ -24,12 +29,8 @@ namespace Daniels.UI
             set
             {
                 base.NumberOfItems = value;
-                if (_smartObject != null && NumberOfItems > 0)
+                if (NumberOfItems > 0)
                 {
-                    Dictionary<uint, SmartObjectDynamicButtonIconListItem> items = new Dictionary<uint, SmartObjectDynamicButtonIconListItem>(NumberOfItems);
-                    for (uint i = 1; i <= NumberOfItems; i++)
-                        items.Add(i, new SmartObjectDynamicButtonIconListItem(this, i));
-                    Items = new ReadOnlyDictionary<uint, SmartObjectDynamicButtonIconListItem>(items);
                 }
             }
         }

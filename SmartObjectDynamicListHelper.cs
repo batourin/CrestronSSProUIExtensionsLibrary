@@ -19,29 +19,37 @@ namespace Daniels.UI
         public const string SetNumberOfItems = "Set Number of Items";
         public const string ItemClicked = "Item Clicked";
 
+        private Dictionary<uint, SmartObjectDynamicListItem> _items;
+
         public SmartObjectDynamicListHelper(SmartObject smartObject, SmartObjectDynamicListHelperParameters helperParams)
             : base(smartObject, helperParams)
         {
+            MaxNumberOfItems = (ushort)_smartObject.BooleanOutput.Count(s => s.Name.EndsWith("Pressed"));
+
+            _items = new Dictionary<uint, SmartObjectDynamicListItem>(MaxNumberOfItems);
+            for (uint i = 1; i <= MaxNumberOfItems; i++)
+                _items.Add(i, new SmartObjectDynamicListItem(this, i));
+            Items = new ReadOnlyDictionary<uint, SmartObjectDynamicListItem>(_items);
+
             NumberOfItems = helperParams.NumberOfItems;
+            if (helperParams.NumberOfItems > MaxNumberOfItems)
+                throw new ArgumentOutOfRangeException("helperParams.NumberOfItems", "Only " + MaxNumberOfItems + " items defined in the SGD file");
+            else
+                NumberOfItems = helperParams.NumberOfItems;
         }
 
         #region Properties
 
-        private ushort _numberOfItems = 0;
+        public ushort MaxNumberOfItems { get; private set; } 
+
         public virtual ushort NumberOfItems
         {
-            get { return _numberOfItems; }
+            get { return _smartObject.UShortInput[SetNumberOfItems].UShortValue; }
             set
             {
-                _numberOfItems = value;
-                if (_smartObject != null && NumberOfItems > 0)
+                if (value > 0 && value <= MaxNumberOfItems)
                 {
-                    _smartObject.UShortInput[SetNumberOfItems].UShortValue = NumberOfItems;
-
-                    Dictionary<uint, SmartObjectDynamicListItem> items = new Dictionary<uint, SmartObjectDynamicListItem>(NumberOfItems);
-                    for (uint i = 1; i <= NumberOfItems; i++)
-                        items.Add(i, new SmartObjectDynamicListItem( this, i));
-                    Items = new ReadOnlyDictionary<uint, SmartObjectDynamicListItem>(items);
+                    _smartObject.UShortInput[SetNumberOfItems].UShortValue = value;
                 }
             }
         }
